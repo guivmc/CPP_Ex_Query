@@ -9,9 +9,13 @@
 #include <map>
 #include <algorithm>
 
-enum CommandType { add = 0, del = 1, info = 2, query = 3 };
+enum CommandType {  defaultType = 0, add = 1, del = 2, info = 3, query = 4 };
+
+enum CommandQueryType { defaultQueryType = 0, fn = 1, ln = 2, bd = 3, pn = 4};
 
 std::map<std::string, CommandType> Prompt;
+
+std::map<std::string, CommandQueryType> PromptQuery;
 
 std::vector<struct CRUD> myList;
 
@@ -42,6 +46,59 @@ std::vector<std::string> split(const std::string &txt, std::vector<std::string> 
 	strs.push_back(txt.substr(initialPos, std::min(pos, txt.size()) - initialPos + 1));
 
 	return strs;
+}
+
+void DoQuery(std::vector<std::string> queries)
+{
+	for (int i = 1; i < queries.size(); i++)
+	{
+		CommandQueryType queryType = PromptQuery[queries.at(i)];
+
+		switch (queryType)
+		{
+		case fn:
+			for (int j = 0; j < myList.size(); j++)
+			{
+				if (myList.at(j).name.compare(queries.at(i)))
+				{
+					std::cout << myList.at(j).name + " ";
+				}
+			}
+			break;
+		case ln:
+			for (int j = 0; j < myList.size(); j++)
+			{
+				if (myList.at(j).lastName.compare(queries.at(i)))
+				{
+					std::cout << myList.at(j).lastName + " ";
+				}
+			}
+			break;
+		case bd:
+			for (int j = 0; j < myList.size(); j++)
+			{
+				if (myList.at(j).birthday.compare(queries.at(i)))
+				{
+					std::cout << myList.at(j).birthday + " ";
+				}
+			}
+			break;
+		case pn:
+			for (int j = 0; j < myList.size(); j++)
+			{
+				if (myList.at(j).phone.compare(queries.at(i + 1)))
+				{
+					std::cout << myList.at(j).phone  + " ";
+				}
+			}
+			break;
+		default:
+			std::cout << std::endl;
+			break;
+		}
+	}
+
+	std::cout << std::endl;
 }
 
 void ReadInput(std::string input)
@@ -104,7 +161,7 @@ void ReadInput(std::string input)
 			{
 				if (myList.at(i).id == std::stoi(splits.at(1)))
 				{
-					std::cout << myList.at(i).id + " - " + myList.at(i).name + " - " + myList.at(i).lastName + " - " + myList.at(i)..birthday + " - "+ myList.at(i).phone + " \n";
+					std::cout << myList.at(i).id + " - " + myList.at(i).name + " - " + myList.at(i).lastName + " - " + myList.at(i).birthday + " - "+ myList.at(i).phone + " \n";
 					return;
 				}
 			}
@@ -114,6 +171,7 @@ void ReadInput(std::string input)
 
 		break;
 	case query:
+		DoQuery(splits);
 		break;
 	default:
 		std::cout << "Invalid Command! \n";
@@ -127,6 +185,11 @@ int main()
 	Prompt["del"] = del;
 	Prompt["info"] = info;
 	Prompt["query"] = query;
+
+	PromptQuery["fn:"] = fn;
+	PromptQuery["ln:"] = ln;
+	PromptQuery["bd:"] = bd;
+	PromptQuery["pn:"] = pn;
 
 	std::string commandInserted = "";
 
@@ -153,3 +216,4 @@ int main()
 //   4. Use a janela Lista de Erros para exibir erros
 //   5. Ir Para o Projeto > Adicionar Novo Item para criar novos arquivos de código, ou Projeto > Adicionar Item Existente para adicionar arquivos de código existentes ao projeto
 //   6. No futuro, para abrir este projeto novamente, vá para Arquivo > Abrir > Projeto e selecione o arquivo. sln
+
